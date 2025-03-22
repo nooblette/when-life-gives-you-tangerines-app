@@ -179,7 +179,7 @@ const OrderForm = () => {
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
       <header className="bg-white p-4 shadow-sm sticky top-0 z-10">
-        <h1 className="text-lg font-bold text-center text-gray-800">제주 감귤</h1>
+        <h1 className="text-lg font-bold text-center text-gray-800">제주 감귤</h1>
       </header>
       
       <div className="max-w-md mx-auto p-4">
@@ -211,7 +211,7 @@ const OrderForm = () => {
                       className="w-10 text-center border-0 bg-transparent"
                     />
                     <button 
-                      className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500 text-white"
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-400 text-white"
                       onClick={() => handleQuantityChange(product.id, orderItems[product.id] + 1)}
                     >
                       +
@@ -221,10 +221,10 @@ const OrderForm = () => {
               </div>
             ))}
           </div>
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          <div className="mt-4 p-4 bg-orange-100 rounded-lg">
             <div className="flex justify-between items-center">
               <span className="font-medium text-gray-700">총 주문금액</span>
-              <span className="font-bold text-lg text-blue-600">{calculateTotal().toLocaleString()}원</span>
+              <span className="font-bold text-lg text-orange-600">{calculateTotal().toLocaleString()}원</span>
             </div>
           </div>
         </section>
@@ -243,7 +243,7 @@ const OrderForm = () => {
                   name="name"
                   value={form.name}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className={`w-full p-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500`}
                   placeholder="이름을 입력해주세요"
                 />
                 {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
@@ -272,7 +272,7 @@ const OrderForm = () => {
                   name="recipient"
                   value={form.recipient}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border ${errors.recipient ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className={`w-full p-3 border ${errors.recipient ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500`}
                   placeholder="받는 분 이름을 입력해주세요"
                 />
                 {errors.recipient && <p className="mt-1 text-sm text-red-500">{errors.recipient}</p>}
@@ -287,7 +287,7 @@ const OrderForm = () => {
                   name="phone"
                   value={form.phone}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className={`w-full p-3 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500`}
                   placeholder="010-0000-0000"
                 />
                 {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
@@ -302,7 +302,7 @@ const OrderForm = () => {
                   name="address"
                   value={form.address}
                   onChange={handleInputChange}
-                  className={`w-full p-3 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  className={`w-full p-3 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500`}
                   placeholder="주소를 입력해주세요"
                 />
                 {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
@@ -317,7 +317,7 @@ const OrderForm = () => {
                   name="detailAddress"
                   value={form.detailAddress}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                   placeholder="상세 주소를 입력해주세요"
                 />
               </div>
@@ -328,7 +328,7 @@ const OrderForm = () => {
           <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg">
             <button
               type="submit"
-              className="w-full p-4 bg-blue-500 text-white font-bold rounded-lg shadow-sm hover:bg-blue-600 transition"
+              className="w-full p-4 bg-orange-400 text-white font-bold rounded-lg shadow-sm hover:bg-orange-300 transition"
             >
               주문하기
             </button>
