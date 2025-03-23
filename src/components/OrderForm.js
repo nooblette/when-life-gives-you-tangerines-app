@@ -20,34 +20,39 @@ const OrderForm = () => {
 
   // 상품 목록 세팅 (API 호출)
   useEffect(() => {
-    setTimeout(() => {
-      const fetchProducts = async () => {
-        try {
-          const response = await fetch(ITEMS_API_URL);
-          if (!response.ok) {
-            throw new Error('상품 목록을 불러오는 데 실패했습니다.');
-          }
-          const data = await response.json();
-          setProducts(data.items);
-  
-          const initialOrderItems = {};
-          data.items.forEach(item => {
-            initialOrderItems[item.id] = 0;
-          });
-          
-          setOrderItems(initialOrderItems);
-        } catch (error) {
-          console.error('상품 목록 가져오기 오류:', error);
-          alert('상품 목록을 가져오는 데 실패했습니다. 나중에 다시 시도해주세요.');
-        } finally {
-          setIsLoading(false);
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(ITEMS_API_URL);
+        if (!response.ok) {
+          throw new Error('상품 목록을 불러오는 데 실패했습니다.');
         }
-      };
-  
-      // 함수 정의 후 호출
-      fetchProducts();
-    }, 1000);
+        const data = await response.json();
+        setProducts(data.items);
+
+        const initialOrderItems = {};
+        data.items.forEach(item => {
+          initialOrderItems[item.id] = 0;
+        });
+        
+        setOrderItems(initialOrderItems);
+      } catch (error) {
+        console.error('상품 목록 가져오기 오류:', error);
+        alert('상품 목록을 가져오는 데 실패했습니다. 나중에 다시 시도해주세요.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // 함수 정의 후 호출
+    fetchProducts();
   }, []);
+
+  // 로딩 스피너
+  const LoadingSpinner = () => (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-orange-400"></div>
+    </div>
+  );
 
   // 수량 변경 핸들러
   const handleQuantityChange = (id, value) => {
@@ -178,9 +183,7 @@ const OrderForm = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-gray-600">로딩 중...</div>
-      </div>
+      <LoadingSpinner />
     );
   }
 
