@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+const API_BASE_URL = "https://21aacb63-5643-4e3d-89e0-dda8ed5d6cf0.mock.pstmn.io";
+const ITEMS_API_URL = `${API_BASE_URL}/items`;
+
 const OrderForm = () => {
   // 상품 목록 Mock 데이터
   const [products, setProducts] = useState([]);
@@ -15,29 +18,34 @@ const OrderForm = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState({});
 
-  // Mock API 호출
+  // 상품 목록 세팅 (API 호출)
   useEffect(() => {
-    // API 호출 시뮬레이션
     setTimeout(() => {
-      const mockProducts = [
-        { id: 1, name: '제주 노지 감귤 (10~15개입)', weight: '10kg', price: 12000 },
-        { id: 2, name: '제주 노지 감귤 (20~25개입)', weight: '15kg', price: 20000 },
-        { id: 3, name: '자연 방목 계란', weight: '10개입', price: 6000 },
-        { id: 4, name: '친환경 샐러드', weight: '200g', price: 4500 },
-        { id: 5, name: '프리미엄 소고기', weight: '500g', price: 25000 },
-        { id: 6, name: '통밀 식빵', weight: '400g', price: 5800 }
-      ];
-      
-      setProducts(mockProducts);
-      
-      // 초기 주문 상태 설정
-      const initialOrderItems = {};
-      mockProducts.forEach(product => {
-        initialOrderItems[product.id] = 0;
-      });
-      
-      setOrderItems(initialOrderItems);
-      setIsLoading(false);
+      const fetchProducts = async () => {
+        try {
+          const response = await fetch(ITEMS_API_URL);
+          if (!response.ok) {
+            throw new Error('상품 목록을 불러오는 데 실패했습니다.');
+          }
+          const data = await response.json();
+          setProducts(data.items);
+  
+          const initialOrderItems = {};
+          data.items.forEach(item => {
+            initialOrderItems[item.id] = 0;
+          });
+          
+          setOrderItems(initialOrderItems);
+        } catch (error) {
+          console.error('상품 목록 가져오기 오류:', error);
+          alert('상품 목록을 가져오는 데 실패했습니다. 나중에 다시 시도해주세요.');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      // 함수 정의 후 호출
+      fetchProducts();
     }, 1000);
   }, []);
 
