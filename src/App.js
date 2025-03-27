@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './styles/tailwind.css';
 import OrderPage from './pages/OrderPage';
 import PaymentPage from './pages/PaymentPage';
+import SuccessPage from './pages/SuccessPage';
+import FailPage from './pages/FailPage';
 
 function App() {
   return (
@@ -10,6 +12,8 @@ function App() {
       <Routes>
         <Route path="/" element={<OrderPage />} />
         <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/success" element={<SuccessPage />} />
+        <Route path="/fail" element={<FailPage />} />
       </Routes>
     </BrowserRouter>
   );
