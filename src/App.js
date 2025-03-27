@@ -1,12 +1,17 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './styles/tailwind.css';
 import OrderPage from './pages/OrderPage';
+import PaymentPage from './pages/PaymentPage';
 
 function App() {
   return (
-    <div className="App">
-      <OrderPage />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<OrderPage />} />
+        <Route path="/payment" element={<PaymentPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

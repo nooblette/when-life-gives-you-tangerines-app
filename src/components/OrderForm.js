@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = "https://21aacb63-5643-4e3d-89e0-dda8ed5d6cf0.mock.pstmn.io";
 const ITEMS_API_URL = `${API_BASE_URL}/items`;
+const ORDER_API_URL = `${API_BASE_URL}/order`;
 
 const OrderForm = () => {
+  const navigate = useNavigate();
+  
   // 상품 목록 Mock 데이터
   const [products, setProducts] = useState([]);
   const [orderItems, setOrderItems] = useState({});
@@ -131,7 +135,7 @@ const OrderForm = () => {
   };
 
   // 주문 처리
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -169,9 +173,34 @@ const OrderForm = () => {
       totalAmount: orderedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
     };
     
-    // API 호출 시뮬레이션
+    // 주문 생성 API 호출
+    try {
+      const response = await fetch(ORDER_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if(!response.ok) {
+        throw new Error('주문 생성에 실패했습니다.')
+      }
+
+      const {orderId} = await response.json();
+
+      // orderId를 전달하며 결제 페이지로 이동
+      
+      // TODO 테스트용 콘솔 출력, 지울 것
+      console.log(orderId) 
+      navigate(`/payment?orderId=${orderId}`);
+    } catch (error) {
+      console.log('주문 요청 중 오류 발생: ', error);
+      alert('주문 요청 중 문제가 발생했습니다. 다시 시도해주세요.')
+    }
+
+    // TODO 테스트용 콘솔 출력, 지울 것
     console.log('주문 데이터:', orderData);
-    alert('주문이 완료되었습니다!');
   };
 
   // 총 주문 금액 계산
