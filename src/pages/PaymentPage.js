@@ -29,8 +29,17 @@ const PaymentPage = () => {
     fetchOrder();
   }, [orderId]);
 
+  // 로딩 스피너
+  const LoadingSpinner = () => (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-orange-400"></div>
+    </div>
+  );
+    
   if (!orderData) {
-    return <p className="p-4 text-gray-600">주문 정보를 불러오는 중입니다...</p>;
+    return (
+      <LoadingSpinner />
+    );
   }
 
   return (
