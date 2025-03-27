@@ -323,7 +323,7 @@ const OrderForm = () => {
                   연락처 <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="text"
+                  type="tel"
                   name="phone"
                   value={form.phone}
                   onChange={handleInputChange}
