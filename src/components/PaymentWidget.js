@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 const CLIENT_KEY = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 
 const PaymentWidget = ({ orderData }) => {
+  // TODO 테스트용 콘솔 출력, 지울 것
   console.log(orderData)
   const [widgets, setWidgets] = useState(null);
   const [ready, setReady] = useState(false);
-  const [amount, setAmount] = useState({
+  const [amount] = useState({
     currency: "KRW",
     value: orderData.totalAmount,
   });

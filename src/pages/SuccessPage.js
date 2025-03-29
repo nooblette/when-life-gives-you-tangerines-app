@@ -54,8 +54,8 @@ function SuccessPage() {
           // 주문 정보 상태 저장
           setOrderData(data);
         } catch (err) {
-          alert("주문 정보를 불러오지 못했습니다.");
           console.error(err);
+          navigate(`/fail?message=${json.message}&code=${json.code}`);
         }
       };
 
