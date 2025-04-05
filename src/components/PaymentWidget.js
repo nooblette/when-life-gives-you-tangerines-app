@@ -41,18 +41,12 @@ const PaymentWidget = ({ orderData }) => {
 
   // iOS Safari의 shapshot으로 인한 위젯 중복 오류 방지
   useEffect(() => {
-    const resetMyState = (event) => {
-      if(event?.persisted) {
-        setMyState("initState");
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        // 뒤로가기(back-forward cache)로 복원된 경우 강제 새로고침
+        window.location.reload();
       }
-    };
-  
-    // 전체 페이지 새로고침 없이 React 내부 상태만 초기화
-    window.addEventListener("pageshow", resetMyState);
-
-    return () => {
-      window.removeEventListener("pageshow", resetMyState);
-    };
+    });
   }, []);
 
   useEffect(() => {
@@ -78,6 +72,11 @@ const PaymentWidget = ({ orderData }) => {
     };
 
     renderPaymentWidgets();
+    
+    return () => {
+      // 토스 페이먼츠 위젯 클린 업
+      widgets?.destroy()
+    };
   }, [widgets]);
 
   if (!isValidOrderData(orderData)) {
