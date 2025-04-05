@@ -33,6 +33,8 @@ function FailPage() {
         return "잔액이 부족해요.";
       case "TIMEOUT":
         return "응답 시간이 초과됐어요.";
+      case "INVALID_ORDER_DATA":
+        return "유효하지 않은 주문 정보예요.";
       default:
         return "죄송합니다. 알 수 없는 이유로 결제가 실패했어요.";
     }

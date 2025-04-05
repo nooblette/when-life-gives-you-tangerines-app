@@ -1,17 +1,28 @@
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { isValidOrderData } from '../utils/validateOrderData';
 
 const CLIENT_KEY = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 
 const PaymentWidget = ({ orderData }) => {
+  const navigate = useNavigate();
+
   // TODO 테스트용 콘솔 출력, 지울 것
   console.log(orderData)
+  const [myState, setMyState] = useState(null);
   const [widgets, setWidgets] = useState(null);
   const [ready, setReady] = useState(false);
   const [amount] = useState({
     currency: "KRW",
     value: orderData.totalAmount,
   });
+
+  useEffect(() => {
+    if (!isValidOrderData(orderData)) {
+      navigate(`/fail?message=${encodeURIComponent("유효하지 않은 주문 정보")}&code=${encodeURIComponent("INVALID_ORDER_DATA")}`);
+    }
+  }, [orderData, navigate]);
 
   useEffect(() => {
     const init = async () => {
@@ -30,12 +41,18 @@ const PaymentWidget = ({ orderData }) => {
 
   // iOS Safari의 shapshot으로 인한 위젯 중복 오류 방지
   useEffect(() => {
-    window.addEventListener("pageshow", (event) => {
-      if (event.persisted) {
-        // 뒤로가기(back-forward cache)로 복원된 경우 강제 새로고침
-        window.location.reload();
+    const resetMyState = (event) => {
+      if(event?.persisted) {
+        setMyState("initState");
       }
-    });
+    };
+  
+    // 전체 페이지 새로고침 없이 React 내부 상태만 초기화
+    window.addEventListener("pageshow", resetMyState);
+
+    return () => {
+      window.removeEventListener("pageshow", resetMyState);
+    };
   }, []);
 
   useEffect(() => {
@@ -63,6 +80,10 @@ const PaymentWidget = ({ orderData }) => {
     renderPaymentWidgets();
   }, [widgets]);
 
+  if (!isValidOrderData(orderData)) {
+    return;
+  }
+
   return (
     <div className="wrapper">
       <div className="box_section">
@@ -77,6 +98,11 @@ const PaymentWidget = ({ orderData }) => {
         className="button w-full p-4 bg-orange-400 text-white font-bold rounded-lg shadow-sm hover:bg-orange-300 transition"
         disabled={!ready}
         onClick={async () => {
+          if (!isValidOrderData(orderData)) {
+            alert("결제에 필요한 정보가 누락되었습니다.");
+            return;
+          }
+          
           try {
             await widgets.requestPayment({
               orderId: orderData.orderId,
