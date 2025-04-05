@@ -10,7 +10,6 @@ const PaymentWidget = ({ orderData }) => {
 
   // TODO 테스트용 콘솔 출력, 지울 것
   console.log(orderData)
-  const [myState, setMyState] = useState(null);
   const [widgets, setWidgets] = useState(null);
   const [ready, setReady] = useState(false);
   const [amount] = useState({
