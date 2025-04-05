@@ -28,6 +28,16 @@ const PaymentWidget = ({ orderData }) => {
     init();
   }, []);
 
+  // iOS Safari의 shapshot으로 인한 위젯 중복 오류 방지
+  useEffect(() => {
+    window.addEventListener("pageshow", (event) => {
+      if (event.persisted) {
+        // 뒤로가기(back-forward cache)로 복원된 경우 강제 새로고침
+        window.location.reload();
+      }
+    });
+  }, []);
+
   useEffect(() => {
     const renderPaymentWidgets = async () => {
       if (!widgets) return;
