@@ -1,6 +1,6 @@
 // src/pages/PaymentPage.js
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import PaymentWidget from "../components/PaymentWidget";
 
 const API_BASE_URL = "https://21aacb63-5643-4e3d-89e0-dda8ed5d6cf0.mock.pstmn.io";
@@ -8,6 +8,7 @@ const ORDER_API_URL = `${API_BASE_URL}/order`;
 
 const PaymentPage = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate(); 
   const [orderData, setOrderData] = useState(null);
   const orderId = searchParams.get("orderId");
 
@@ -21,7 +22,7 @@ const PaymentPage = () => {
         const data = await res.json();
         setOrderData(data);
       } catch (err) {
-        alert("주문 정보를 불러오지 못했습니다.");
+        navigate(`/fail?message=${encodeURIComponent("유효하지 않은 주문 정보")}&code=${encodeURIComponent("INVALID_ORDER_DATA")}`);
         console.error(err);
       }
     };
