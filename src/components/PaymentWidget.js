@@ -1,5 +1,5 @@
 import { loadTossPayments, ANONYMOUS } from "@tosspayments/tosspayments-sdk";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { isValidOrderData } from '../utils/validateOrderData';
 
@@ -16,6 +16,8 @@ const PaymentWidget = ({ orderData }) => {
     currency: "KRW",
     value: orderData.totalAmount,
   });
+  const paymentMethodWidgetRef = useRef(null);
+  const agreementWidgetRef = useRef(null);
 
   useEffect(() => {
     if (!isValidOrderData(orderData)) {
@@ -55,26 +57,31 @@ const PaymentWidget = ({ orderData }) => {
       // 주문의 결제 금액 세팅
       await widgets.setAmount(amount);
 
-      await Promise.all([
-        // 결제 UI 렌더링
-        widgets.renderPaymentMethods({
-          selector: "#payment-method",
-          variantKey: "DEFAULT",
-        }),
-        // 이용약관 UI 렌더링
-        widgets.renderAgreement({
-          selector: "#agreement",
-          variantKey: "AGREEMENT",
-        }),
-      ]);
+      // 결제 UI 렌더링
+      const methodWidget = await widgets.renderPaymentMethods({
+        selector: "#payment-method",
+        variantKey: "DEFAULT",
+      });
+
+      // 이용약관 UI 렌더링
+      const agreeWidget = await widgets.renderAgreement({
+        selector: "#agreement",
+        variantKey: "AGREEMENT",
+      });
+    
+      paymentMethodWidgetRef.current = methodWidget;
+      agreementWidgetRef.current = agreeWidget;
       setReady(true);
     };
 
     renderPaymentWidgets();
     
     return () => {
-      // 토스 페이먼츠 위젯 클린 업
-      widgets?.destroy()
+      // 토스 페이먼츠 결제 위젯 클린 업
+      paymentMethodWidgetRef.current?.destroy();
+
+      // 이용 약관 클린 업
+      agreementWidgetRef.current?.destroy();
     };
   }, [widgets]);
 
