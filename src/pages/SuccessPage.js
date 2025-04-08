@@ -28,6 +28,12 @@ function SuccessPage() {
       paymentKey: searchParams.get("paymentKey"),
     };
 
+    // 필수 파라미터가 없으면 실패 페이지로 리다이렉트
+    if (!requestData || !requestData.orderId || !requestData.amount || !requestData.paymentKey) {
+      navigate(`/fail?code=INVALID_PARAMS`);
+      return;
+    }
+
     async function confirm() {
       setLoading(true);
       // TODO 서버에 API 호출하여 결제 금액 재확인, 주문 상태 업데이트
@@ -197,11 +203,13 @@ function SuccessPage() {
                 <p className="text-gray-600">주문 정보를 불러오는 중입니다...</p>
               </div>
             ) : (
-              <div className="text-center py-16">
-                <p className="text-red-500">결제 정보를 확인하는 데 실패했습니다.</p>
+              <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <p className="text-gray-700 mb-6">
+                  결제 진행 중 문제가 발생했습니다.
+                </p>
                 <button
                   onClick={handleComplete}
-                  className="mt-4 px-6 py-2 bg-gray-200 text-gray-800 rounded-lg"
+                  className="w-full p-4 bg-orange-400 text-white font-bold rounded-lg shadow-sm hover:bg-orange-300 transition"
                 >
                   홈으로 돌아가기
                 </button>
