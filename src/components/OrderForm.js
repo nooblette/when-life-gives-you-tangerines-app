@@ -17,10 +17,48 @@ const OrderForm = () => {
     sameAsOrderer: false,
     phone: '',
     address: '',
-    detailAddress: ''
+    detailAddress: '',
+    zipCode: ''
   });
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState({});
+
+  // Daum 우편번호 스크립트 로드
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  // 우편번호 검색 팝업 열기
+  const openAddressPopup = () => {
+    if (window.daum && window.daum.Postcode) {
+      new window.daum.Postcode({
+        oncomplete: function(data) {
+          setForm(prev => ({
+            ...prev,
+            zipCode: data.zonecode,
+            address: data.address
+          }));
+          
+          // 주소 관련 에러 제거
+          if (errors.address) {
+            setErrors(prev => ({
+              ...prev,
+              address: null
+            }));
+          }
+        }
+      }).open();
+    } else {
+      alert('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+    }
+  };
 
   // 상품 목록 세팅 (API 호출)
   useEffect(() => {
@@ -129,6 +167,10 @@ const OrderForm = () => {
     if (!form.address.trim()) {
       newErrors.address = '주소를 입력해주세요';
     }
+
+    if (!form.zipCode.trim()) {
+      newErrors.zipCode = '우편번호를 입력해주세요';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -166,6 +208,7 @@ const OrderForm = () => {
         name: form.name,
         recipient: form.recipient,
         phone: form.phone,
+        zipCode: form.zipCode,
         address: form.address,
         detailAddress: form.detailAddress
       },
@@ -333,6 +376,32 @@ const OrderForm = () => {
                 {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
               </div>
               
+              {/* 우편번호 검색 추가 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  우편번호 <span className="text-red-500">*</span>
+                </label>
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    name="zipCode"
+                    value={form.zipCode}
+                    onChange={handleInputChange}
+                    className={`flex-1 p-3 border ${errors.zipCode ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500`}
+                    placeholder="우편번호"
+                    readOnly
+                  />
+                  <button
+                    type="button"
+                    onClick={openAddressPopup}
+                    className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                  >
+                    검색
+                  </button>
+                </div>
+                {errors.zipCode && <p className="mt-1 text-sm text-red-500">{errors.zipCode}</p>}
+              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   주소 <span className="text-red-500">*</span>
@@ -344,6 +413,7 @@ const OrderForm = () => {
                   onChange={handleInputChange}
                   className={`w-full p-3 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500`}
                   placeholder="주소를 입력해주세요"
+                  readOnly
                 />
                 {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
               </div>
