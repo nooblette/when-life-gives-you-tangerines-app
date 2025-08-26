@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 function FailPage() {
   const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
+  const errorMessage = searchParams.get("message") || "알 수 없는 이유로 결제에 실패했어요." ;
   const [loading, setLoading] = useState(true);
   const [failConfirmed, setFailConfirmed] = useState(false);
 
@@ -19,27 +20,6 @@ function FailPage() {
 
   const handleGoHome = () => {
     window.location.href = "/";
-  };
-
-  const getErrorMessage = (code) => {
-    switch (code) {
-      case "USER_CANCEL":
-        return "사용자가 결제를 취소했어요.";
-      case "PAY_PROCESS_FAILED":
-        return "결제 처리 중 오류가 발생했어요.";
-      case "INVALID_CARD":
-        return "유효하지 않은 카드 정보예요.";
-      case "INSUFFICIENT_FUNDS":
-        return "잔액이 부족해요.";
-      case "TIMEOUT":
-        return "응답 시간이 초과됐어요.";
-      case "INVALID_ORDER_DATA":
-        return "유효하지 않은 주문 정보예요.";
-      case "INVALID_PARAMS":
-        return "필수 결제 정보가 누락됐어요.";
-      default:
-        return "죄송합니다. 알 수 없는 이유로 결제가 실패했어요.";
-    }
   };
 
   return (
@@ -78,7 +58,7 @@ function FailPage() {
                   strokeWidth={1.5}
                 />
                 <h1 className="text-2xl font-bold text-gray-800">결제 실패</h1>
-                <p className="text-gray-600 mt-2">{getErrorMessage(code)}</p>
+                <p className="text-gray-600 mt-2">{errorMessage}</p>
               </div>
             </div>
           )}
