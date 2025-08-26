@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const API_BASE_URL = "https://21aacb63-5643-4e3d-89e0-dda8ed5d6cf0.mock.pstmn.io";
-const ITEMS_API_URL = `${API_BASE_URL}/items`;
-const ORDER_API_URL = `${API_BASE_URL}/order`;
+import { API_CONFIG } from '../config/api';
 
 const OrderForm = () => {
   const navigate = useNavigate();
@@ -64,7 +61,7 @@ const OrderForm = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(ITEMS_API_URL);
+        const response = await fetch(API_CONFIG.ITEMS_LIST);
         if (!response.ok) {
           throw new Error('상품 목록을 불러오는 데 실패했습니다.');
         }
@@ -190,7 +187,7 @@ const OrderForm = () => {
       .map(([id, quantity]) => {
         const product = products.find(p => p.id === parseInt(id));
         return {
-          productId: parseInt(id),
+          id: parseInt(id),
           name: product.name,
           quantity,
           price: product.price
@@ -218,7 +215,7 @@ const OrderForm = () => {
     
     // 주문 생성 API 호출
     try {
-      const response = await fetch(ORDER_API_URL, {
+      const response = await fetch(API_CONFIG.ORDERS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

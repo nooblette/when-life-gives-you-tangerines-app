@@ -2,9 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import PaymentWidget from "../components/PaymentWidget";
-
-const API_BASE_URL = "https://21aacb63-5643-4e3d-89e0-dda8ed5d6cf0.mock.pstmn.io";
-const ORDER_API_URL = `${API_BASE_URL}/order`;
+import { API_CONFIG } from "../config/api";
 
 const PaymentPage = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +16,7 @@ const PaymentPage = () => {
     // orderId로 주문 정보를 받아온다.
     const fetchOrder = async () => {
       try {
-        const res = await fetch(`${ORDER_API_URL}/${orderId}`);
+        const res = await fetch(API_CONFIG.ORDER_DETAIL(orderId));
         const data = await res.json();
         setOrderData(data);
       } catch (err) {

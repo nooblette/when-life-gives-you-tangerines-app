@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircleIcon } from 'lucide-react';
-
-const API_BASE_URL = "https://21aacb63-5643-4e3d-89e0-dda8ed5d6cf0.mock.pstmn.io";
-const CONFIRM_API_URL = `${API_BASE_URL}/confirm`;
-const ORDER_API_URL = `${API_BASE_URL}/order`;
+import { API_CONFIG } from "../config/api";
 
 function SuccessPage() {
   const navigate = useNavigate();
@@ -23,13 +20,13 @@ function SuccessPage() {
     // 쿼리 파라미터 값이 결제 요청할 때 보낸 데이터와 동일한지 반드시 확인하세요.
     // 클라이언트에서 결제 금액을 조작하는 행위를 방지할 수 있습니다.
     const requestData = {
-      orderId: searchParams.get("orderId"),
-      amount: searchParams.get("amount"),
+      totalAmount: searchParams.get("amount"),
       paymentKey: searchParams.get("paymentKey"),
     };
+    const orderId = searchParams.get("orderId")
 
     // 필수 파라미터가 없으면 실패 페이지로 리다이렉트
-    if (!requestData || !requestData.orderId || !requestData.amount || !requestData.paymentKey) {
+    if (!requestData || !orderId || !requestData.totalAmount || !requestData.paymentKey) {
       navigate(`/fail?code=INVALID_PARAMS`);
       return;
     }
@@ -38,7 +35,7 @@ function SuccessPage() {
       setLoading(true);
       // TODO 서버에 API 호출하여 결제 금액 재확인, 주문 상태 업데이트
       try {
-        const response = await fetch(CONFIRM_API_URL, {
+        const response = await fetch(API_CONFIG.ORDERS_PAYMENT_APPROVE(orderId), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -60,7 +57,7 @@ function SuccessPage() {
         // 결제 성공 비즈니스 로직
         // orderId로 주문 정보를 받아온다.
         try {
-          const orderResponse = await fetch(`${ORDER_API_URL}/${requestData.orderId}`);
+          const orderResponse = await fetch(API_CONFIG.ORDER_DETAIL(orderId));
           const orderData = await orderResponse.json();
 
           // 주문 정보 상태 저장
