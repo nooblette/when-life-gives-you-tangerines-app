@@ -111,7 +111,9 @@ const PaymentWidget = ({ orderData }) => {
           try {
             await widgets.requestPayment({
               orderId: orderData.orderId,
-              orderName: orderData.items.map((i) => i.name).join(", "),
+              orderName: (() => {
+                return `${orderData.items[0].name} ${orderData.items[0].quantity}개${orderData.items.length > 1 ? ` 외 ${orderData.items.length - 1}건` : ''}`;
+              })(),
               successUrl: `${window.location.origin}/success`,
               failUrl: `${window.location.origin}/fail`,
               customerEmail: "customer@example.com",
