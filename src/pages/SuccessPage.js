@@ -128,7 +128,7 @@ function SuccessPage() {
                   strokeWidth={1.5}
                 />
                 <h1 className="text-2xl font-bold text-gray-800">주문 완료</h1>
-                <p className="text-gray-600 mt-2">감사합니다</p>
+                <p className="text-gray-600 mt-2">곧바로 신선한 귤을 보내드릴게요.</p>
               </div>
             </div>
           )}
