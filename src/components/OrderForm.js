@@ -59,9 +59,13 @@ const OrderForm = () => {
 
   // 상품 목록 세팅 (API 호출)
   useEffect(() => {
+    const abortController = new AbortController();
+    
     const fetchProducts = async () => {
       try {
-        const response = await fetch(API_CONFIG.ITEMS_LIST);
+        const response = await fetch(API_CONFIG.ITEMS_LIST, {
+          signal: abortController.signal
+        });
         if (!response.ok) {
           throw new Error('상품 목록을 불러오는 데 실패했습니다.');
         }
@@ -75,15 +79,20 @@ const OrderForm = () => {
         
         setOrderItems(initialOrderItems);
       } catch (error) {
-        console.error('상품 목록 가져오기 오류:', error);
-        alert('상품 목록을 가져오는 데 실패했습니다. 나중에 다시 시도해주세요.');
+        if (error.name !== 'AbortError') {
+          console.error('상품 목록 가져오기 오류:', error);
+          alert('상품 목록을 가져오는 데 실패했습니다. 나중에 다시 시도해주세요.');
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    // 함수 정의 후 호출
     fetchProducts();
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   // 로딩 스피너

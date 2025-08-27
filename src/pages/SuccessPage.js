@@ -17,6 +17,8 @@ function SuccessPage() {
   };
   
   useEffect(() => {
+    const abortController = new AbortController();
+
     // 쿼리 파라미터 값이 결제 요청할 때 보낸 데이터와 동일한지 반드시 확인하세요.
     // 클라이언트에서 결제 금액을 조작하는 행위를 방지할 수 있습니다.
     const requestData = {
@@ -41,6 +43,7 @@ function SuccessPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestData),
+          signal: abortController.signal
         });
 
         const json = await response.json();
@@ -57,24 +60,34 @@ function SuccessPage() {
         // 결제 성공 비즈니스 로직
         // orderId로 주문 정보를 받아온다.
         try {
-          const orderResponse = await fetch(API_CONFIG.ORDER_DETAIL(orderId));
+          const orderResponse = await fetch(API_CONFIG.ORDER_DETAIL(orderId), {
+            signal: abortController.signal
+          });
           const orderData = await orderResponse.json();
 
           // 주문 정보 상태 저장
           setOrderData(orderData);
         } catch (err) {
-          console.error(err);
-          navigate(`/fail?message=${json.message}&code=${json.code}`);
+          if (err.name !== 'AbortError') {
+            console.error(err);
+            navigate(`/fail?message=${json.message}&code=${json.code}`);
+          }
         }
       } catch (error) {
-        console.error(error);
-        navigate(`/fail?message=결제 처리 중 오류가 발생했습니다&code=UNKNOWN_ERROR`);
+        if (error.name !== 'AbortError') {
+          console.error(error);
+          navigate(`/fail?message=결제 처리 중 오류가 발생했습니다&code=UNKNOWN_ERROR`);
+        }
       } finally {
         setLoading(false);
       }
     }
 
     confirm();
+
+    return () => {
+      abortController.abort();
+    };
   }, [navigate, searchParams]);
 
   return (

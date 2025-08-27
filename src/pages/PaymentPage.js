@@ -13,20 +13,30 @@ const PaymentPage = () => {
   useEffect(() => {
     if (!orderId) return;
 
+    const abortController = new AbortController();
+
     // orderId로 주문 정보를 받아온다.
     const fetchOrder = async () => {
       try {
-        const res = await fetch(API_CONFIG.ORDER_DETAIL(orderId));
+        const res = await fetch(API_CONFIG.ORDER_DETAIL(orderId), {
+          signal: abortController.signal
+        });
         const data = await res.json();
         setOrderData(data);
       } catch (err) {
-        navigate(`/fail?message=${encodeURIComponent("유효하지 않은 주문 정보")}&code=${encodeURIComponent("INVALID_ORDER_DATA")}`);
-        console.error(err);
+        if (err.name !== 'AbortError') {
+          navigate(`/fail?message=${encodeURIComponent("유효하지 않은 주문 정보")}&code=${encodeURIComponent("INVALID_ORDER_DATA")}`);
+          console.error(err);
+        }
       }
     };
 
     fetchOrder();
-  }, [orderId]);
+
+    return () => {
+      abortController.abort();
+    };
+  }, [orderId, navigate]);
 
   // 로딩 스피너
   const LoadingSpinner = () => (
