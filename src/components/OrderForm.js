@@ -109,6 +109,14 @@ const OrderForm = () => {
   const handleQuantityChange = (id, value) => {
     if (isNaN(value)) return;
 
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    if (value > product.stock) {
+      alert(`주문 가능한 수량을 확인해 주세요\n(최대 주문 가능: ${product.stock}개)`);
+      return;
+    }
+
     setOrderItems((prev) => ({
       ...prev,
       [id]: value < 0 ? 0 : value,
@@ -287,25 +295,44 @@ const OrderForm = () => {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h3 className="font-medium text-gray-800">
+                    <h3 className={`font-medium ${
+                      product.stock === 0 ? "text-gray-400" : "text-gray-800"
+                    }`}>
                       {product.name}
                     </h3>
                     <div className="text-sm text-gray-500 mt-1">
                       <span>{product.weight}</span>
-                      <span className="ml-2 font-medium text-gray-700">
+                      <span className={`ml-2 font-medium ${
+                        product.stock === 0 ? "text-gray-400" : "text-gray-700"
+                      }`}>
                         {product.price.toLocaleString()}원
                       </span>
+                      {product.stock === 0 ? (
+                        <span className="ml-2 text-red-500 font-medium">
+                          다 팔렸어요
+                        </span>
+                      ) : product.stock <= 5 && (
+                        <span className="ml-2 text-red-500 font-medium">
+                          {product.stock}개 남았어요!
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center space-x-2 ml-4">
                     <button
-                      className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600"
+                      className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                        product.stock === 0
+                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
                       onClick={() =>
+                        product.stock > 0 &&
                         handleQuantityChange(
                           product.id,
                           orderItems[product.id] - 1
                         )
                       }
+                      disabled={product.stock === 0}
                     >
                       -
                     </button>
@@ -313,21 +340,34 @@ const OrderForm = () => {
                       type="text"
                       value={orderItems[product.id]}
                       onChange={(e) =>
+                        product.stock > 0 &&
                         handleQuantityChange(
                           product.id,
                           parseInt(e.target.value) || 0
                         )
                       }
-                      className="w-10 text-center border-0 bg-transparent"
+                      className={`w-10 text-center border-0 bg-transparent ${
+                        product.stock === 0 ? "text-gray-400" : ""
+                      }`}
+                      disabled={product.stock === 0}
                     />
                     <button
-                      className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-400 text-white"
-                      onClick={() =>
-                        handleQuantityChange(
-                          product.id,
-                          orderItems[product.id] + 1
-                        )
-                      }
+                      className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                        product.stock === 0
+                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          : "bg-orange-400 text-white"
+                      }`}
+                      onClick={() => {
+                        if (product.stock > 0) {
+                          const newQuantity = orderItems[product.id] + 1;
+                          if (newQuantity <= product.stock) {
+                            handleQuantityChange(product.id, newQuantity);
+                          } else {
+                            alert(`주문 가능한 수량을 확인해 주세요\n(최대 주문 가능: ${product.stock}개)`);
+                          }
+                        }
+                      }}
+                      disabled={product.stock === 0}
                     >
                       +
                     </button>
