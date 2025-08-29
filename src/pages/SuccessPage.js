@@ -132,6 +132,10 @@ function SuccessPage() {
                   <h2 className="text-lg font-bold mb-4 text-gray-800">주문 정보</h2>
                   <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
                     <div className="flex justify-between">
+                      <span className="text-gray-600">주문번호</span>
+                      <span className="text-gray-800">{orderData.orderId}</span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-gray-600">주문자명</span>
                       <span className="text-gray-800">{orderData.customer.name}</span>
                     </div>
