@@ -9,7 +9,6 @@ function SuccessPage() {
 
   // 주문 정보 상태 변수
   const [orderData, setOrderData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [confirmed, setConfirmed] = useState(false);
 
   const handleComplete = () => {
@@ -19,8 +18,6 @@ function SuccessPage() {
   useEffect(() => {
     const abortController = new AbortController();
 
-    // 쿼리 파라미터 값이 결제 요청할 때 보낸 데이터와 동일한지 반드시 확인하세요.
-    // 클라이언트에서 결제 금액을 조작하는 행위를 방지할 수 있습니다.
     const requestData = {
       totalAmount: searchParams.get("amount"),
       paymentKey: searchParams.get("paymentKey"),
@@ -34,8 +31,6 @@ function SuccessPage() {
     }
 
     async function confirm() {
-      setLoading(true);
-      // TODO 서버에 API 호출하여 결제 금액 재확인, 주문 상태 업데이트
       try {
         const response = await fetch(API_CONFIG.ORDERS_PAYMENT_APPROVE(orderId), {
           method: "POST",
@@ -49,16 +44,14 @@ function SuccessPage() {
         const json = await response.json();
 
         if (!response.ok) {
-          // 결제 실패 비즈니스 로직을 구현하세요.
+          // 결제 실패
+          setConfirmed(false);
           navigate(`/fail?message=${json.message}&code=${json.code}`);
           return;
         }
 
-        // 결제 확인 성공
+        // 결제 성공, orderId로 주문 정보를 받아온다.
         setConfirmed(true);
-
-        // 결제 성공 비즈니스 로직
-        // orderId로 주문 정보를 받아온다.
         try {
           const orderResponse = await fetch(API_CONFIG.ORDER_DETAIL(orderId), {
             signal: abortController.signal
@@ -78,8 +71,6 @@ function SuccessPage() {
           console.error(error);
           navigate(`/fail?message=결제 처리 중 오류가 발생했습니다&code=UNKNOWN_ERROR`);
         }
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -92,12 +83,12 @@ function SuccessPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
-      {loading ? (
+      {!confirmed ? (
         // 로딩 중 화면
         <div className="flex flex-col items-center justify-center min-h-screen">
           <div className="w-16 h-16 border-4 border-orange-300 border-t-orange-500 rounded-full animate-spin mb-4"></div>
-          <h2 className="text-xl font-medium text-gray-700">결제 확인 중...</h2>
-          <p className="text-gray-500 mt-2">잠시만 기다려 주세요</p>
+          <h2 className="text-xl font-bold text-gray-700">주문을 처리하고 있어요.</h2>
+          <p className="text-gray-500 mt-2">잠시만 기다려 주세요.</p>
         </div>
       ) : (
         <>
