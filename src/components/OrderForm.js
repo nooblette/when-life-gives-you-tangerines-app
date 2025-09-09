@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
 
+const MAX_BYTE_LENGTH = 255;
+
 const OrderForm = () => {
   const navigate = useNavigate();
 
@@ -123,22 +125,50 @@ const OrderForm = () => {
     }));
   };
 
+  const getByteLength = (str) => {
+    return new TextEncoder().encode(str).length;
+  };
+
   // 입력 폼 변경 핸들러
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const newValue = name === "phone" ? formatPhoneNumber(value) : value;
+
+    // 256바이트부터는 입력 막기
+    const textFields = ['name', 'recipient', 'address', 'detailAddress'];
+    if (textFields.includes(name) && getByteLength(newValue) > MAX_BYTE_LENGTH + 1) {
+      return;
+    }
 
     setForm((prev) => ({
       ...prev,
       [name]: newValue,
     }));
 
-    // 에러 상태 초기화
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
+    // 255바이트 초과 체크 및 에러 처리
+    if (textFields.includes(name)) {
+      if (getByteLength(newValue) > MAX_BYTE_LENGTH) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: "글자수가 너무 길어요",
+        }));
+      } else {
+        // 에러 상태 초기화
+        if (errors[name]) {
+          setErrors((prev) => ({
+            ...prev,
+            [name]: null,
+          }));
+        }
+      }
+    } else {
+      // 에러 상태 초기화 (전화번호 등 다른 필드)
+      if (errors[name]) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: null,
+        }));
+      }
     }
   };
 
@@ -169,10 +199,14 @@ const OrderForm = () => {
 
     if (!form.name.trim()) {
       newErrors.name = "주문자 이름을 입력해주세요";
+    } else if (getByteLength(form.name) > MAX_BYTE_LENGTH) {
+      newErrors.name = "글자수가 너무 길어요";
     }
 
     if (!form.recipient.trim()) {
       newErrors.recipient = "받는 사람 이름을 입력해주세요";
+    } else if (getByteLength(form.recipient) > MAX_BYTE_LENGTH) {
+      newErrors.recipient = "글자수가 너무 길어요";
     }
 
     const phoneRegex = /^010-\d{4}-\d{4}$/;
@@ -182,6 +216,12 @@ const OrderForm = () => {
 
     if (!form.address.trim()) {
       newErrors.address = "주소를 입력해주세요";
+    } else if (getByteLength(form.address) > MAX_BYTE_LENGTH) {
+      newErrors.address = "글자수가 너무 길어요";
+    }
+
+    if (getByteLength(form.detailAddress) > MAX_BYTE_LENGTH) {
+      newErrors.detailAddress = "글자수가 너무 길어요";
     }
 
     if (!form.zipCode.trim()) {
@@ -406,7 +446,7 @@ const OrderForm = () => {
                   placeholder="이름을 입력해주세요"
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                  <p className="mt-1 text-xs text-red-500">{errors.name}</p>
                 )}
               </div>
 
@@ -442,7 +482,7 @@ const OrderForm = () => {
                   placeholder="받는 분 이름을 입력해주세요"
                 />
                 {errors.recipient && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p className="mt-1 text-xs text-red-500">
                     {errors.recipient}
                   </p>
                 )}
@@ -513,7 +553,7 @@ const OrderForm = () => {
                   readOnly
                 />
                 {errors.address && (
-                  <p className="mt-1 text-sm text-red-500">{errors.address}</p>
+                  <p className="mt-1 text-xs text-red-500">{errors.address}</p>
                 )}
               </div>
 
@@ -526,9 +566,14 @@ const OrderForm = () => {
                   name="detailAddress"
                   value={form.detailAddress}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className={`w-full p-3 border ${
+                    errors.detailAddress ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500`}
                   placeholder="상세 주소를 입력해주세요"
                 />
+                {errors.detailAddress && (
+                  <p className="mt-1 text-xs text-red-500">{errors.detailAddress}</p>
+                )}
               </div>
             </div>
           </section>
