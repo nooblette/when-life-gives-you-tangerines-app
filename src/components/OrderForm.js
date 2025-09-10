@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
 
-const MAX_BYTE_LENGTH = 255;
+const MAX_LENGTH = 80;
 
 const OrderForm = () => {
   const navigate = useNavigate();
@@ -125,18 +125,14 @@ const OrderForm = () => {
     }));
   };
 
-  const getByteLength = (str) => {
-    return new TextEncoder().encode(str).length;
-  };
-
   // 입력 폼 변경 핸들러
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const newValue = name === "phone" ? formatPhoneNumber(value) : value;
 
-    // 256바이트부터는 입력 막기
+    // 81자부터는 입력 막기
     const textFields = ['name', 'recipient', 'address', 'detailAddress'];
-    if (textFields.includes(name) && getByteLength(newValue) > MAX_BYTE_LENGTH + 1) {
+    if (textFields.includes(name) && newValue.length > MAX_LENGTH) {
       return;
     }
 
@@ -145,9 +141,9 @@ const OrderForm = () => {
       [name]: newValue,
     }));
 
-    // 255바이트 초과 체크 및 에러 처리
+    // 80자 초과 체크 및 에러 처리
     if (textFields.includes(name)) {
-      if (getByteLength(newValue) > MAX_BYTE_LENGTH) {
+      if (newValue.length >= MAX_LENGTH) {
         setErrors((prev) => ({
           ...prev,
           [name]: "글자수가 너무 길어요",
@@ -199,13 +195,13 @@ const OrderForm = () => {
 
     if (!form.name.trim()) {
       newErrors.name = "주문자 이름을 입력해주세요";
-    } else if (getByteLength(form.name) > MAX_BYTE_LENGTH) {
+    } else if (form.name.length >= MAX_LENGTH) {
       newErrors.name = "글자수가 너무 길어요";
     }
 
     if (!form.recipient.trim()) {
       newErrors.recipient = "받는 사람 이름을 입력해주세요";
-    } else if (getByteLength(form.recipient) > MAX_BYTE_LENGTH) {
+    } else if (form.recipient.length >= MAX_LENGTH) {
       newErrors.recipient = "글자수가 너무 길어요";
     }
 
@@ -216,11 +212,11 @@ const OrderForm = () => {
 
     if (!form.address.trim()) {
       newErrors.address = "주소를 입력해주세요";
-    } else if (getByteLength(form.address) > MAX_BYTE_LENGTH) {
+    } else if (form.address.length >= MAX_LENGTH) {
       newErrors.address = "글자수가 너무 길어요";
     }
 
-    if (getByteLength(form.detailAddress) > MAX_BYTE_LENGTH) {
+    if (form.detailAddress.length >= MAX_LENGTH) {
       newErrors.detailAddress = "글자수가 너무 길어요";
     }
 
