@@ -38,7 +38,8 @@ function SuccessPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestData),
-          signal: abortController.signal
+          signal: abortController.signal,
+          credentials: "include",
         });
 
         const json = await response.json();
@@ -54,7 +55,8 @@ function SuccessPage() {
         setConfirmed(true);
         try {
           const orderResponse = await fetch(API_CONFIG.ORDER_DETAIL(orderId), {
-            signal: abortController.signal
+            signal: abortController.signal,
+            credentials: "include",
           });
           const orderData = await orderResponse.json();
 

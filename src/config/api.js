@@ -6,4 +6,5 @@ export const API_CONFIG = {
   ORDERS: `${BASE_URL}/orders`,
   ORDERS_PAYMENT_APPROVE: (orderId) => `${BASE_URL}/orders/${orderId}/payments`,
   ORDER_DETAIL: (orderId) => `${BASE_URL}/orders/${orderId}`,
+  SESSIONS: `${BASE_URL}/sessions`,
 };

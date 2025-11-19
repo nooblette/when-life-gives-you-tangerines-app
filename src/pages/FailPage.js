@@ -48,12 +48,12 @@ function FailPage() {
             실패 코드: {code || "알 수 없음"}
           </p>
           <p className="text-sm text-gray-400 mt-2">
-            계속 실패하면{" "}
+            계속 실패하면 {" "}
             <a
-              href="mailto:min9hyuk@gmail.com"
+              href="sms:+821073430850?"
               className="text-orange-500 underline"
             >
-              min9hyuk@gmail.com
+              010-7343-0850
             </a>
             으로 연락주세요.
           </p>

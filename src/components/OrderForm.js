@@ -60,10 +60,25 @@ const OrderForm = () => {
     }
   };
 
-  // 상품 목록 세팅 (API 호출)
   useEffect(() => {
     const abortController = new AbortController();
 
+    // 세션 활성화
+    const activateSession = async () => {
+      try {
+        await fetch(API_CONFIG.SESSIONS, {
+          method: "POST",
+          credentials: "include",
+          signal: abortController.signal,
+        });
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("세션 활성화 실패:", error);
+        }
+      }
+    };
+
+    // 상품 목록 세팅
     const fetchProducts = async () => {
       try {
         const response = await fetch(API_CONFIG.ITEMS_LIST, {
@@ -93,6 +108,7 @@ const OrderForm = () => {
       }
     };
 
+    activateSession();
     fetchProducts();
 
     return () => {
@@ -284,10 +300,18 @@ const OrderForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(orderData),
+        credentials: "include",
       });
 
       if (!response.ok) {
-        throw new Error("주문 생성에 실패했습니다.");
+        // 서버가 내려준 message가 있으면 사용, 없으면 기본 메시지 사용
+        const error = await response.json();
+        throw new Error(JSON.stringify(
+          { 
+            message: error.message || "주문 생성에 실패했습니다.", 
+            code: error.code || "INVALID_ORDER_DATA" 
+          }
+        ));
       }
 
       const { orderId } = await response.json();
@@ -295,8 +319,18 @@ const OrderForm = () => {
       // orderId를 전달하며 결제 페이지로 이동
       navigate(`/payment?orderId=${orderId}`);
     } catch (error) {
-      console.log("주문 요청 중 오류 발생: ", error);
-      alert("주문 요청 중 문제가 발생했습니다. 다시 시도해주세요.");
+      // 에러 객체에서 message와 code 파싱
+      let message = "주문 요청 중 문제가 발생했습니다.";
+      let code = "INVALID_ORDER_DATA";
+
+      try {
+        const parsed = JSON.parse(error.message);
+        message = parsed.message || message;
+        code = parsed.code || code;
+      } catch (e) {
+      }
+
+      navigate(`/fail?message=${encodeURIComponent(message)}&code=${encodeURIComponent(code)}`);
     }
   };
 

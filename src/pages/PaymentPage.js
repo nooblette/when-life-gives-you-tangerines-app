@@ -19,7 +19,8 @@ const PaymentPage = () => {
     const fetchOrder = async () => {
       try {
         const res = await fetch(API_CONFIG.ORDER_DETAIL(orderId), {
-          signal: abortController.signal
+          signal: abortController.signal,
+          credentials: "include",
         });
         const data = await res.json();
         setOrderData(data);
