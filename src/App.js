@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Analytics } from "@vercel/analytics";
+import { Analytics } from "@vercel/analytics/react";
 import './styles/tailwind.css';
 import OrderPage from './pages/OrderPage';
 import PaymentPage from './pages/PaymentPage';
