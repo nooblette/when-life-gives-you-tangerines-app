@@ -349,7 +349,7 @@ const OrderForm = () => {
     <div className="bg-gray-50 min-h-screen pb-20">
       <header className="bg-white p-4 shadow-sm sticky top-0 z-10">
         <h1 className="text-lg font-bold text-center text-gray-800">
-          제주 감귤
+          래아농원
         </h1>
       </header>
 
