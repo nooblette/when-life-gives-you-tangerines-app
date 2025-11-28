@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_CONFIG } from "../config/api";
 
@@ -6,6 +6,7 @@ const MAX_LENGTH = 80;
 
 const OrderForm = () => {
   const navigate = useNavigate();
+  const privacyCheckboxRef = useRef(null);
 
   // 상품 목록 Mock 데이터
   const [products, setProducts] = useState([]);
@@ -21,6 +22,7 @@ const OrderForm = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState({});
+  const [privacyAgreed, setPrivacyAgreed] = useState(false);
 
   // Daum 우편번호 스크립트 로드
   useEffect(() => {
@@ -247,6 +249,18 @@ const OrderForm = () => {
   // 주문 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 개인정보 동의 체크 확인
+    if (!privacyAgreed) {
+      // 체크박스로 스크롤
+      privacyCheckboxRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+      // 체크박스에 포커스
+      privacyCheckboxRef.current?.focus();
+      return;
+    }
 
     if (!validateForm()) {
       return;
@@ -608,11 +622,69 @@ const OrderForm = () => {
             </div>
           </section>
 
+          {/* 개인정보 동의 섹션 */}
+          <section className="mb-8">
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <div className="flex items-start">
+                <input
+                  ref={privacyCheckboxRef}
+                  type="checkbox"
+                  id="privacyAgreement"
+                  checked={privacyAgreed}
+                  onChange={(e) => setPrivacyAgreed(e.target.checked)}
+                  className="mt-1 mr-2 w-4 h-4 text-orange-500 focus:outline-none"
+                />
+                <label htmlFor="privacyAgreement" className="text-sm font-medium text-gray-700">
+                  <span className="text-red-500">[필수]</span> 개인정보 수집 및 이용에 동의합니다.
+                  <div className="mt-2 text-xs text-gray-600 font-normal leading-relaxed">
+                    - 수집 항목: 이름, 휴대폰번호, 주소, 우편번호<br />
+                    - 수집 목적: 주문 처리, 배송, 고객 상담<br />
+                    - 보유 기간: 전자상거래법에 따른 의무 보관기간 준수
+                  </div>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          {/* 필수 안내사항 섹션 */}
+          <section className="mb-24">
+            <div className="text-xs text-gray-500 leading-relaxed space-y-3">
+              <div>
+                <div className="font-semibold mb-1">[안내사항]</div>
+                <div className="space-y-0.5">
+                  <div>• 원산지: 제주산(국산)</div>
+                  <div>• 배송방법: 택배 / 배송예정일: 주문 후 2~4일 이내 발송</div>
+                  <div>• 배송비: 무료</div>
+                  <div>• 반품 및 환불 문의: 010-7343-0850 / min9hyuk@gmail.com</div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="font-semibold mb-1">[사업자 정보]</div>
+                <div className="space-y-0.5">
+                  <div>상호: 래아팜 | 대표: 홍길동 | 사업자등록번호: 123-45-67890</div>
+                  <div>통신판매업 신고번호: 제 2025-제주-0000호</div>
+                  <div>주소: 제주특별자치도 ○○ | 호스팅사: Vercel</div>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <div>주문 시 개인정보는 주문처리 및 배송을 위해 이용되며,</div>
+                <div>전자상거래법에 따른 의무 보관기간 후 파기됩니다.</div>
+              </div>
+            </div>
+          </section>
+
           {/* 주문하기 버튼 */}
           <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg">
             <button
               type="submit"
-              className="w-full p-4 bg-orange-400 text-white font-bold rounded-lg shadow-sm hover:bg-orange-300 transition"
+              disabled={!privacyAgreed}
+              className={`w-full p-4 font-bold rounded-lg shadow-sm transition ${
+                privacyAgreed
+                  ? "bg-orange-400 text-white hover:bg-orange-300"
+                  : "bg-orange-300 text-white cursor-not-allowed opacity-60"
+              }`}
             >
               주문하기
             </button>
